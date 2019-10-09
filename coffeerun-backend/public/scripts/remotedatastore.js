@@ -5,6 +5,7 @@
   var CHECKLIST_SELECTOR = "[data-coffee-order='checklist']";
   var CheckList = App.CheckList;
   var checkList = new CheckList(CHECKLIST_SELECTOR);
+  var myid;
 
   function RemoteDataStore(url) {
     if (!url) {
@@ -19,16 +20,14 @@
     });
   };
   RemoteDataStore.prototype.getAll = function() {
-    RemoteDataStore.prototype.getAll = function(cb){
-    $.get(this.serverUrl, function (serverResponse){
-      console.log(serverResponse);
-      cb = serverResponse;
-
-      cb.forEach(function(orders){
-        checkList.addRow(orders);
+    RemoteDataStore.prototype.getAll = function(cb) {
+      $.get(this.serverUrl, function(serverResponse) {
+        console.log(serverResponse);
+        serverResponse.forEach(function(object) {
+          checkList.addRow(object);
+        });
       });
-    });
-  };
+    };
   };
   RemoteDataStore.prototype.get = function(key, cb) {
     $.get(this.serverUrl + '/' + key, function(serverResponse) {
@@ -37,8 +36,15 @@
     });
   };
   RemoteDataStore.prototype.remove = function(key) {
-    $.ajax(this.serverUrl + '/' + key, {
-      type: 'DELETE'
+    var getUrl = this.serverUrl;
+    $.get(this.serverUrl, function(serverResponse) {
+      console.log(serverResponse);
+      serverResponse.forEach(function(object) {
+        console.log("ID is " + object.id);
+        $.ajax(getUrl + '/' + object.id, {
+          type: 'DELETE'
+        });
+      });
     });
   };
 
